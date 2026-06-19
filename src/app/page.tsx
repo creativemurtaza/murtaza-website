@@ -164,19 +164,16 @@ export default function Home() {
         {/* Header */}
         <header style={{ textAlign: "center", padding: "clamp(48px,9vw,88px) 0 clamp(40px,7vw,64px)" }}>
           <Anim>
-            <Image
-              src="/avatar.png"
-              alt="Ghulam Murtaza"
-              width={86}
-              height={86}
-              style={{
-                borderRadius: "22px",
-                objectFit: "cover",
-                objectPosition: "center top",
-                boxShadow: "0 8px 24px -12px oklch(0.52 0.18 274 / 0.5)"
-              }}
-              priority
-            />
+            <div style={{ width: "86px", height: "86px", borderRadius: "22px", overflow: "hidden", margin: "0 auto", boxShadow: "0 8px 24px -12px oklch(0.52 0.18 274 / 0.5)" }}>
+              <Image
+                src="/avatar.png"
+                alt="Ghulam Murtaza"
+                width={200}
+                height={200}
+                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
+                priority
+              />
+            </div>
           </Anim>
           <Anim delay={60}>
             <h1 style={{ margin: "26px 0 0", fontSize: "clamp(32px,5.5vw,42px)", fontWeight: 700, letterSpacing: "-0.03em" }}>
