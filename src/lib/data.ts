@@ -9,9 +9,23 @@ export const profile = {
     linkedin: "https://linkedin.com/in/murtaza-ameen",
     instagram: "https://instagram.com/murtaxa00",
   },
+  about: [
+    "I'm a BBA graduate from IBA – University of the Punjab, with a background in marketing and business development. But over the years, I've grown into something harder to put in a single job title: someone who bridges business, design, and technology.",
+    "I've worked across corporate environments — logistics, healthcare tech, consumer tech, and smartphones — while simultaneously building software products, designing interfaces, and creating animations as a freelancer. I've always been more interested in making things than just describing them.",
+    "Right now I'm focused on product development: understanding problems, designing solutions, and building them end to end. I believe the most interesting work happens at the intersection of business thinking and technical execution.",
+  ],
 };
 
 export const experience = [
+  {
+    id: "vivo",
+    company: "Vivo Pakistan",
+    role: "Sales & Business Development",
+    period: "Sep 2025 – Present",
+    description:
+      "Managing key accounts and supporting business development initiatives for one of Pakistan's leading smartphone brands. Building and maintaining relationships with retail partners and distribution channels.",
+    tags: ["Sales", "Key Account Management", "Business Development"],
+  },
   {
     id: "emirates",
     company: "Emirates Logistics",
@@ -29,15 +43,6 @@ export const experience = [
     description:
       "Identified 50+ potential partners and grew the sales pipeline by 15%. Prepared business proposals and managed client onboarding workflows.",
     tags: ["Business Development", "Partnerships", "Sales"],
-  },
-  {
-    id: "curemd",
-    company: "CureMD",
-    role: "Business Development – Intern",
-    period: "2024",
-    description:
-      "Conducted market and competitor analysis for healthcare technology products. Led lead generation and client outreach initiatives.",
-    tags: ["Healthcare Tech", "Market Research", "Lead Generation"],
   },
   {
     id: "freelance",

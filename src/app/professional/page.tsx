@@ -16,11 +16,13 @@ export default function ProfessionalPage() {
           {profile.name}
         </h1>
         <p className="text-lg text-neutral-500 mb-6 font-medium">{profile.headline}</p>
-        <p className="text-base text-neutral-600 leading-relaxed max-w-2xl mb-8">
-          Marketing graduate with a strong foundation in business development, product thinking, and digital tools.
-          I have worked across logistics, healthcare tech, and travel tech — while simultaneously building products,
-          designing interfaces, and creating animations as a freelancer.
-        </p>
+        <div className="space-y-4 max-w-2xl mb-8">
+          {profile.about.map((para, i) => (
+            <p key={i} className="text-base text-neutral-600 leading-relaxed">
+              {para}
+            </p>
+          ))}
+        </div>
         <div className="flex flex-wrap gap-4 text-sm text-neutral-500">
           <span className="flex items-center gap-1.5">
             <MapPin size={14} className="text-neutral-400" />

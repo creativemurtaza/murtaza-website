@@ -24,14 +24,26 @@ export default function CreativePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-24">
       {/* Header */}
-      <div className="mb-12">
+      <div className="mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-4">
           Creative Work
         </h1>
-        <p className="text-base text-neutral-500 max-w-xl leading-relaxed">
-          A selection of projects across product design, software development, animation, and branding.
-          Each project represents a problem I found worth solving.
+        <p className="text-base text-neutral-500 max-w-xl leading-relaxed mb-8">
+          From SaaS explainer animations to product apps — a selection of work across design, development, animation, and branding. Each project started with a problem worth solving.
         </p>
+        {/* Stats */}
+        <div className="flex flex-wrap gap-6 text-sm">
+          {[
+            { value: "38+", label: "Projects delivered" },
+            { value: "26+", label: "Satisfied clients" },
+            { value: "5 yrs", label: "Freelance experience" },
+          ].map((stat) => (
+            <div key={stat.label}>
+              <span className="font-semibold text-neutral-900">{stat.value}</span>
+              <span className="text-neutral-400 ml-1.5">{stat.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Filter tabs */}
