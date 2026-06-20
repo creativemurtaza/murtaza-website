@@ -1,14 +1,13 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { LayoutDashboard, Briefcase, GraduationCap, Wrench, FolderOpen, FileText, Award } from "lucide-react";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Admin",
-  description: "Content management dashboard",
-};
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { createBrowserSupabase } from "@/lib/supabase";
+import { LayoutDashboard, User, Briefcase, GraduationCap, Wrench, FolderOpen, FileText, Award, LogOut } from "lucide-react";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/profile", label: "Profile", icon: User },
   { href: "/admin/experience", label: "Experience", icon: Briefcase },
   { href: "/admin/education", label: "Education", icon: GraduationCap },
   { href: "/admin/skills", label: "Skills", icon: Wrench },
@@ -18,32 +17,66 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  async function handleSignOut() {
+    const supabase = createBrowserSupabase();
+    await supabase.auth.signOut();
+    window.location.href = "/admin/login";
+  }
+
+  const isActive = (item: typeof navItems[0]) =>
+    item.exact ? pathname === item.href : pathname.startsWith(item.href);
+
   return (
-    <div className="flex min-h-screen bg-neutral-50">
+    <div style={{ display: "flex", minHeight: "100vh", background: "var(--surface)" }}>
       {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-56 bg-white border-r border-neutral-200 shrink-0">
-        <div className="p-4 border-b border-neutral-200">
-          <Link href="/" className="text-sm font-semibold text-neutral-900 hover:text-neutral-600 transition-colors">
+      <aside style={{
+        width: "220px", background: "#fff", borderRight: "1px solid var(--line)",
+        display: "flex", flexDirection: "column", flexShrink: 0,
+      }}>
+        <div style={{ padding: "16px", borderBottom: "1px solid var(--line)" }}>
+          <Link href="/" style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)" }}>
             ← Back to Site
           </Link>
-          <p className="text-xs text-neutral-400 mt-1">Admin Dashboard</p>
+          <p style={{ fontSize: "12px", color: "var(--ink-4)", marginTop: "4px" }}>Admin Dashboard</p>
         </div>
-        <nav className="p-3 flex-1">
+        <nav style={{ padding: "12px", flex: 1 }}>
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-colors mb-0.5"
+              style={{
+                display: "flex", alignItems: "center", gap: "10px",
+                borderRadius: "8px", padding: "8px 12px", marginBottom: "2px",
+                fontSize: "13px", fontWeight: isActive(item) ? 500 : 400,
+                color: isActive(item) ? "var(--ink)" : "var(--ink-3)",
+                background: isActive(item) ? "var(--surface)" : "transparent",
+              }}
             >
               <item.icon size={15} />
               {item.label}
             </Link>
           ))}
         </nav>
+        <div style={{ padding: "12px", borderTop: "1px solid var(--line)" }}>
+          <button
+            onClick={handleSignOut}
+            style={{
+              display: "flex", alignItems: "center", gap: "10px", width: "100%",
+              borderRadius: "8px", padding: "8px 12px",
+              fontSize: "13px", color: "var(--ink-4)",
+              background: "none", border: "none", cursor: "pointer",
+            }}
+          >
+            <LogOut size={15} />
+            Sign Out
+          </button>
+        </div>
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 overflow-auto">
+      {/* Main */}
+      <div style={{ flex: 1, overflow: "auto" }}>
         {children}
       </div>
     </div>
