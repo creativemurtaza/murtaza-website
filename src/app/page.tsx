@@ -162,7 +162,7 @@ export default function Home() {
         </div>
 
         {/* Header */}
-        <header style={{ textAlign: "center", padding: "clamp(48px,9vw,88px) 0 clamp(40px,7vw,64px)" }}>
+        <header style={{ textAlign: "center", padding: "clamp(48px,9vw,88px) 0 clamp(24px,4vw,36px)" }}>
           <Anim>
             <div style={{ width: "86px", height: "86px", borderRadius: "22px", overflow: "hidden", margin: "0 auto", boxShadow: "0 8px 24px -12px oklch(0.52 0.18 274 / 0.5)" }}>
               <Image
@@ -185,35 +185,10 @@ export default function Home() {
               {profile.headline}
             </p>
           </Anim>
-          <Anim delay={160}>
-            <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "24px", flexWrap: "wrap" }}>
-              <Link href="/professional" style={{
-                display: "inline-flex", alignItems: "center", gap: "6px",
-                background: "var(--ink)", color: "var(--bg)",
-                borderRadius: "9px", padding: "10px 20px", fontSize: "14px", fontWeight: 500
-              }}>
-                View Profile
-              </Link>
-              <Link href="/creative" style={{
-                display: "inline-flex", alignItems: "center", gap: "6px",
-                border: "1px solid var(--line)", color: "var(--ink-2)",
-                borderRadius: "9px", padding: "10px 20px", fontSize: "14px", fontWeight: 500
-              }}>
-                Creative Work
-              </Link>
-              <Link href="/contact" style={{
-                display: "inline-flex", alignItems: "center", gap: "6px",
-                border: "1px solid var(--line)", color: "var(--ink-2)",
-                borderRadius: "9px", padding: "10px 20px", fontSize: "14px", fontWeight: 500
-              }}>
-                Get in Touch
-              </Link>
-            </div>
-          </Anim>
         </header>
 
         {/* About */}
-        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
+        <section style={{ padding: "clamp(24px,4vw,36px) 0" }} className="section-divider">
           <Anim><p className="label">About</p></Anim>
           <Anim delay={40}>
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
