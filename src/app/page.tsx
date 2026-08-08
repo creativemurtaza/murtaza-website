@@ -3,7 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { profile, experience, projects, blogPosts, skills } from "@/lib/data";
+import { profile as staticProfile, experience as staticExperience, projects as staticProjects, blogPosts as staticBlogPosts, skills as staticSkills } from "@/lib/data";
+import { getProfile, getExperience, getProjects, getBlogPosts, getSkills } from "@/lib/queries";
+import type { Profile, Experience, Project, BlogPost, SkillsByCategory } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
 // Live Lahore clock (GMT+5)
@@ -83,6 +85,20 @@ function Anim({ children, delay = 0, className = "" }: { children: React.ReactNo
 }
 
 export default function Home() {
+  const [profile, setProfile] = useState<Profile>({ ...staticProfile, id: "main", avatar_url: "/avatar.png", social: staticProfile.social });
+  const [experience, setExperience] = useState<Experience[]>(staticExperience.map((e, i) => ({ ...e, sort_order: i })));
+  const [projects, setProjects] = useState<Project[]>(staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, sort_order: i })));
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(staticBlogPosts.map((p) => ({ ...p, read_time: p.readTime, published_at: p.date, is_published: true })));
+  const [skills, setSkills] = useState<SkillsByCategory>(staticSkills);
+
+  useEffect(() => {
+    getProfile().then(setProfile);
+    getExperience().then(setExperience);
+    getProjects().then(setProjects);
+    getBlogPosts().then(setBlogPosts);
+    getSkills().then(setSkills);
+  }, []);
+
   return (
     <>
       <style>{`
@@ -311,7 +327,7 @@ export default function Home() {
                 <Link href={`/blog/${post.slug}`} className="contact-row" style={{ display: "flex", gap: "16px", alignItems: "baseline", textDecoration: "none" }}>
                   <span style={{ fontSize: "16px", fontWeight: 500 }}>{post.title}</span>
                   <span style={{ fontSize: "13px", color: "var(--ink-4)", fontFamily: "var(--font-geist-mono)", whiteSpace: "nowrap" }}>
-                    {formatDate(post.date)}
+                    {formatDate(post.published_at ?? "")}
                   </span>
                 </Link>
               </Anim>
@@ -332,8 +348,8 @@ export default function Home() {
           <div>
             {[
               { k: "Email", v: profile.email, href: `mailto:${profile.email}` },
-              { k: "LinkedIn", v: "/in/murtazaameen", href: profile.social.linkedin },
-              { k: "Instagram", v: "murtaxa00", href: profile.social.instagram },
+              { k: "LinkedIn", v: "/in/murtazaameen", href: profile.social.linkedin ?? "#" },
+              { k: "Instagram", v: "murtaxa00", href: profile.social.instagram ?? "#" },
             ].map((row, i) => (
               <Anim key={row.k} delay={i * 50}>
                 <Link href={row.href} target={row.href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer" className="contact-row">

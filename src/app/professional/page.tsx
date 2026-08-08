@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
-import { profile, experience, education, skills, certifications } from "@/lib/data";
+import { useEffect, useRef, useState } from "react";
+import { profile as staticProfile, experience as staticExperience, education as staticEducation, skills as staticSkills, certifications as staticCertifications } from "@/lib/data";
+import { getProfile, getExperience, getEducation, getSkills, getCertifications } from "@/lib/queries";
+import type { Profile, Experience, Education, SkillsByCategory, Certification } from "@/lib/types";
 
 const LOGOS: Record<string, string> = {
   vivo: "/logos/vivo.png",
@@ -31,6 +33,20 @@ function Anim({ children, delay = 0 }: { children: React.ReactNode; delay?: numb
 }
 
 export default function ProfessionalPage() {
+  const [profile, setProfile] = useState<Profile>({ ...staticProfile, id: "main", avatar_url: "/avatar.png", social: staticProfile.social });
+  const [experience, setExperience] = useState<Experience[]>(staticExperience.map((e, i) => ({ ...e, sort_order: i })));
+  const [education, setEducation] = useState<Education[]>(staticEducation.map((e, i) => ({ ...e, sort_order: i })));
+  const [skills, setSkills] = useState<SkillsByCategory>(staticSkills);
+  const [certifications, setCertifications] = useState<Certification[]>(staticCertifications.map((c, i) => ({ ...c, sort_order: i })));
+
+  useEffect(() => {
+    getProfile().then(setProfile);
+    getExperience().then(setExperience);
+    getEducation().then(setEducation);
+    getSkills().then(setSkills);
+    getCertifications().then(setCertifications);
+  }, []);
+
   return (
     <>
       <style>{`
