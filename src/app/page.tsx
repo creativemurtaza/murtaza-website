@@ -170,7 +170,7 @@ export default function Home() {
             </div>
             <div className="proof-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {[
-                { num: "1 hr", desc: "saved daily by the Expense Tracker" },
+                { num: "300+", desc: "hours saved yearly by the Expense Tracker" },
                 { num: "38+", desc: "motion projects delivered freelance" },
                 { num: "26+", desc: "clients across those projects" },
               ].map((stat, i) => (

@@ -24,6 +24,7 @@ export function Nav() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "26px clamp(20px, 5vw, 36px) 0",
         maxWidth: "700px", margin: "0 auto",
+        width: "100%",
       }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", fontWeight: 600, fontSize: "14.5px", color: "inherit", textDecoration: "none" }}>
           <span style={{
@@ -36,11 +37,14 @@ export function Nav() {
           Ghulam Murtaza
         </Link>
         <Link href="/professional" style={{
-          fontSize: "13.5px", color: "var(--ink-3)",
-          textDecoration: "underline", textUnderlineOffset: "3px",
-          textDecorationColor: "var(--line)", transition: "text-decoration-color .25s, color .25s",
+          fontSize: "13px", fontWeight: 500, color: "var(--ink)",
+          padding: "7px 16px", borderRadius: "8px",
+          border: "1px solid var(--line)",
+          background: "var(--bg)",
+          textDecoration: "none",
+          transition: "background .2s, border-color .2s",
         }}>
-          Resume
+          Resume →
         </Link>
       </header>
     );
