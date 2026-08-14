@@ -15,6 +15,22 @@ const LOGOS: Record<string, string> = {
   cubefilms: "/logos/cubefilm.png",
 };
 
+function Clock() {
+  const [time, setTime] = useState("—:—");
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const pk = new Date(utc + 5 * 3600000);
+      setTime(`${pk.getHours()}:${String(pk.getMinutes()).padStart(2, "0")}`);
+    };
+    tick();
+    const id = setInterval(tick, 10000);
+    return () => clearInterval(id);
+  }, []);
+  return <span>{time}</span>;
+}
+
 function Anim({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -71,9 +87,24 @@ export default function ProfessionalPage() {
 
       <div style={{ maxWidth: "660px", margin: "0 auto", paddingInline: "clamp(20px, 5vw, 36px)" }}>
 
-        {/* Back */}
-        <div style={{ paddingTop: "26px" }}>
-          <Link href="/" style={{ fontSize: "13px", color: "var(--ink-4)", fontWeight: 500 }}>← Back</Link>
+        {/* Status bar */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          paddingTop: "26px", fontSize: "12.5px", textTransform: "uppercase",
+          letterSpacing: "0.08em", color: "var(--ink-4)",
+        }}>
+          <Link href="/" className="mono" style={{ display: "inline-flex", alignItems: "center", gap: "7px", color: "var(--ink-4)", textDecoration: "underline", textUnderlineOffset: "3px" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M15 18 9 12l6-6"/>
+            </svg>
+            Back to site
+          </Link>
+          <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: "7px" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+            </svg>
+            <Clock /> GMT+5
+          </span>
         </div>
 
         {/* Header */}
@@ -178,6 +209,41 @@ export default function ProfessionalPage() {
           </div>
         </section>
 
+        {/* Languages */}
+        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
+          <Anim><p className="label">Languages</p></Anim>
+          <Anim delay={40}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {[{ lang: "Urdu", level: "Native" }, { lang: "English", level: "Fluent" }].map((l) => (
+                <div key={l.lang} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "16px 0", borderBottom: "1px solid var(--line-soft)" }}>
+                  <span style={{ fontSize: "16.5px", fontWeight: 500 }}>{l.lang}</span>
+                  <span style={{ fontSize: "15.5px", color: "var(--ink-2)" }}>{l.level}</span>
+                </div>
+              ))}
+            </div>
+          </Anim>
+        </section>
+
+        {/* Contact */}
+        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
+          <Anim><p className="label">Contact</p></Anim>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {[
+              { k: "Email", v: profile.email, href: `mailto:${profile.email}` },
+              { k: "LinkedIn", v: "/in/murtazaameen", href: profile.social.linkedin ?? "#" },
+              { k: "Instagram", v: "murtaxa00", href: profile.social.instagram ?? "#" },
+            ].map((row, i) => (
+              <Anim key={row.k} delay={i * 50}>
+                <a href={row.href} target={row.href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer"
+                  style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "16px", padding: "16px 0", borderBottom: i < 2 ? "1px solid var(--line-soft)" : "none", textDecoration: "none" }}>
+                  <span style={{ fontSize: "16.5px", fontWeight: 500 }}>{row.k}</span>
+                  <span style={{ fontSize: "15.5px", color: "var(--ink-2)" }}>{row.v}</span>
+                </a>
+              </Anim>
+            ))}
+          </div>
+        </section>
+
         {/* Skills */}
         <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
           <Anim><p className="label">Skills</p></Anim>
@@ -196,21 +262,6 @@ export default function ProfessionalPage() {
               </div>
             </Anim>
           ))}
-        </section>
-
-        {/* Languages */}
-        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
-          <Anim><p className="label">Languages</p></Anim>
-          <Anim delay={40}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-              {[{ lang: "Urdu", level: "Native" }, { lang: "English", level: "Fluent" }].map((l) => (
-                <div key={l.lang} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <span style={{ fontSize: "16px", fontWeight: 500 }}>{l.lang}</span>
-                  <span style={{ fontSize: "14px", color: "var(--ink-4)" }}>{l.level}</span>
-                </div>
-              ))}
-            </div>
-          </Anim>
         </section>
 
         {/* Footer */}

@@ -2,388 +2,323 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { Inter } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
-import { profile as staticProfile, experience as staticExperience, projects as staticProjects, blogPosts as staticBlogPosts, skills as staticSkills } from "@/lib/data";
-import { getProfile, getExperience, getProjects, getBlogPosts, getSkills } from "@/lib/queries";
-import type { Profile, Experience, Project, BlogPost, SkillsByCategory } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
+import { profile as staticProfile, experience as staticExperience, projects as staticProjects } from "@/lib/data";
+import { getProfile, getExperience, getProjects } from "@/lib/queries";
+import type { Profile, Experience, Project } from "@/lib/types";
 
-// Live Lahore clock (GMT+5)
-function Clock() {
-  const [time, setTime] = useState("--:--");
-  useEffect(() => {
-    const tick = () => {
-      const now = new Date();
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-      const pk = new Date(utc + 5 * 3600000);
-      const h = pk.getHours();
-      const m = String(pk.getMinutes()).padStart(2, "0");
-      setTime(`${h}:${m}`);
-    };
-    tick();
-    const id = setInterval(tick, 10000);
-    return () => clearInterval(id);
-  }, []);
-  return <span>{time}</span>;
-}
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
-// Logo map for experience entries
-const LOGOS: Record<string, string> = {
-  vivo: "/logos/vivo.png",
-  emirates: "/logos/emirates.png",
-  bookme: "/logos/bookme.png",
-  freelance: "/logos/fiverr.png",
-  cubefilms: "/logos/cubefilm.png",
-};
-
-// Fade-up animation hook
-function useFadeIn() {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("in");
-          io.unobserve(el);
-        }
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -6% 0px" }
-    );
-    io.observe(el);
-    setTimeout(() => el.classList.add("in"), 1800);
-    return () => io.disconnect();
-  }, []);
-  return ref;
-}
-
-function Anim({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+function Anim({ children, delay = 0, style = {} }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     el.style.transitionDelay = `${delay}ms`;
     const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("in");
-          io.unobserve(el);
-        }
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -6% 0px" }
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add("in"); io.unobserve(el); } },
+      { threshold: 0.15, rootMargin: "0px 0px -6% 0px" }
     );
     io.observe(el);
     setTimeout(() => el.classList.add("in"), 1800);
     return () => io.disconnect();
   }, [delay]);
-  return (
-    <div ref={ref} className={`anim ${className}`}>
-      {children}
-    </div>
-  );
+  return <div ref={ref} className="anim" style={style}>{children}</div>;
 }
 
 export default function Home() {
-  const [profile, setProfile] = useState<Profile>({ ...staticProfile, id: "main", avatar_url: "/avatar.png", social: staticProfile.social });
-  const [experience, setExperience] = useState<Experience[]>(staticExperience.map((e, i) => ({ ...e, sort_order: i })));
-  const [projects, setProjects] = useState<Project[]>(staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, sort_order: i })));
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(staticBlogPosts.map((p) => ({ ...p, read_time: p.readTime, published_at: p.date, is_published: true })));
-  const [skills, setSkills] = useState<SkillsByCategory>(staticSkills);
+  const [profile, setProfile] = useState<Profile>({
+    ...staticProfile, id: "main", avatar_url: "/avatar.png", social: staticProfile.social,
+  });
+  const [experience, setExperience] = useState<Experience[]>(
+    staticExperience.map((e, i) => ({ ...e, sort_order: i }))
+  );
+  const [projects, setProjects] = useState<Project[]>(
+    staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, sort_order: i }))
+  );
 
   useEffect(() => {
     getProfile().then(setProfile);
     getExperience().then(setExperience);
     getProjects().then(setProjects);
-    getBlogPosts().then(setBlogPosts);
-    getSkills().then(setSkills);
   }, []);
+
+  const companies = [...new Set(experience.map((e) => e.company))];
 
   return (
     <>
       <style>{`
+        .home-page {
+          --bg: oklch(0.994 0.001 100);
+          --surface: oklch(0.972 0.004 70);
+          --line: oklch(0.9 0.004 70);
+          --line-soft: oklch(0.93 0.003 70);
+          --ink: oklch(0.21 0.004 100);
+          --ink-2: oklch(0.5 0.006 60);
+          --ink-3: oklch(0.62 0.006 60);
+          --ink-4: oklch(0.72 0.006 60);
+          --accent: oklch(0.55 0.13 45);
+          --ease: cubic-bezier(0.22, 1, 0.36, 1);
+          background: var(--bg);
+          background-image: radial-gradient(oklch(0.9 0.004 70 / 0.6) 1px, transparent 1px);
+          background-size: 26px 26px;
+          background-position: -6px -6px;
+          color: var(--ink);
+        }
         .anim {
-          opacity: 0;
-          transform: translateY(16px);
-          transition: opacity .64s var(--ease), transform .64s var(--ease);
+          opacity: 0; transform: translateY(14px);
+          transition: opacity .6s var(--ease), transform .6s var(--ease);
           will-change: opacity, transform;
         }
         .anim.in { opacity: 1; transform: none; }
         @media (prefers-reduced-motion: reduce) {
           .anim { opacity: 1 !important; transform: none !important; transition: none !important; }
         }
-        .item-logo {
-          width: 40px; height: 40px; flex: none;
-          display: inline-flex; align-items: center; justify-content: center;
-          padding: 7px;
-          background: #fff;
-          border: 1px solid var(--line-soft);
-          border-radius: 10px;
-          box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
-          transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease);
+        .home-section { padding: clamp(44px, 7vw, 60px) 0; border-top: 1px dashed var(--line); }
+        .home-label { margin: 0 0 10px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--ink); }
+        .home-cue { margin: 0; font-size: 13px; font-style: italic; color: var(--ink-4); }
+        .cta-btn {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 12px 20px; border-radius: 10px; border: 1px solid var(--ink);
+          color: var(--ink); font-weight: 500; font-size: 15px; text-decoration: none;
+          transition: background .25s var(--ease), color .25s var(--ease), transform .25s var(--ease);
         }
-        .item-entry:hover .item-logo {
-          transform: translateY(-2px);
-          border-color: var(--line);
-          box-shadow: 0 6px 16px -8px oklch(0 0 0 / 0.18);
-        }
-        .pill {
-          font-size: 14px; color: var(--ink-2);
-          padding: 8px 14px; border-radius: 9px;
+        .cta-btn:hover { background: var(--ink); color: var(--bg); transform: translateY(-1px); }
+        .pill-arc {
+          font-size: 13.5px; color: var(--ink-2);
+          padding: 7px 13px; border-radius: 9px;
           border: 1px solid var(--line);
-          background: var(--bg);
-          transition: color .25s, border-color .25s, transform .25s var(--ease), background .25s;
-          cursor: default;
         }
-        .pill:hover {
-          color: var(--ink); border-color: var(--ink-4);
-          transform: translateY(-1px); background: var(--surface);
+        .status-pill {
+          display: inline-block; font-size: 11.5px; text-transform: uppercase;
+          letter-spacing: .07em; color: var(--ink-4);
+          padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px;
+          font-family: var(--font-geist-mono);
         }
-        .section-divider { border-top: 1px dashed var(--line); }
-        .label {
-          margin: 0 0 30px;
-          font-size: 13px; font-weight: 600;
-          text-transform: uppercase; letter-spacing: 0.1em;
-          color: var(--ink);
+        @media (max-width: 640px) {
+          .hero-grid { grid-template-columns: 1fr !important; }
+          .hero-photo { flex-direction: row !important; align-items: flex-start; }
+          .proof-grid { grid-template-columns: 1fr 1fr !important; }
         }
-        .contact-row {
-          display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-          padding: 16px 0; border-bottom: 1px solid var(--line-soft);
-        }
-        .contact-row:last-child { border-bottom: 0; }
-        .contact-row:first-child { padding-top: 0; }
       `}</style>
 
-      <div style={{ maxWidth: "660px", margin: "0 auto", paddingInline: "clamp(20px, 5vw, 36px)" }}>
+      <div className={`home-page ${inter.className}`} style={{ minHeight: "100vh" }}>
+        <div style={{ maxWidth: "700px", margin: "0 auto", paddingInline: "clamp(20px, 5vw, 36px)" }}>
 
-        {/* Top status bar */}
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          paddingTop: "26px", fontSize: "12.5px", textTransform: "uppercase",
-          letterSpacing: "0.08em", color: "var(--ink-4)"
-        }}>
-          <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: "7px" }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/>
-              <circle cx="12" cy="10" r="2.5"/>
-            </svg>
-            Lahore, Pakistan
-          </span>
-          <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: "7px" }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
-            </svg>
-            <Clock /> GMT+5
-          </span>
-        </div>
-
-        {/* Header */}
-        <header style={{ textAlign: "center", padding: "clamp(48px,9vw,88px) 0 clamp(24px,4vw,36px)" }}>
-          <Anim>
-            <div style={{ width: "86px", height: "86px", borderRadius: "22px", overflow: "hidden", margin: "0 auto", boxShadow: "0 8px 24px -12px oklch(0.52 0.18 274 / 0.5)" }}>
-              <Image
-                src="/avatar.png"
-                alt="Ghulam Murtaza"
-                width={200}
-                height={200}
-                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
-                priority
-              />
-            </div>
-          </Anim>
-          <Anim delay={60}>
-            <h1 style={{ margin: "26px 0 0", fontSize: "clamp(32px,5.5vw,42px)", fontWeight: 700, letterSpacing: "-0.03em" }}>
-              {profile.name}
-            </h1>
-          </Anim>
-          <Anim delay={120}>
-            <p style={{ margin: "10px 0 0", fontSize: "clamp(17px,2.2vw,20px)", color: "var(--ink-2)", fontWeight: 400 }}>
-              {profile.headline}
-            </p>
-          </Anim>
-        </header>
-
-        {/* About */}
-        <section style={{ padding: "clamp(24px,4vw,36px) 0" }} className="section-divider">
-          <Anim><p className="label">About</p></Anim>
-          <Anim delay={40}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {profile.about.map((para, i) => (
-                <p key={i} style={{ margin: 0, fontSize: "17px", color: "var(--ink-2)", lineHeight: 1.66 }}>
-                  {para}
-                </p>
-              ))}
-            </div>
-          </Anim>
-        </section>
-
-        {/* Experience */}
-        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
-          <Anim><p className="label">Experience</p></Anim>
-          <div style={{ display: "flex", flexDirection: "column", gap: "38px" }}>
-            {experience.map((job, i) => (
-              <Anim key={job.id} delay={i * 50}>
-                <div className="item-entry" style={{ display: "grid", gridTemplateColumns: "40px 1fr", gap: "18px" }}>
-                  <span className="item-logo">
-                    {LOGOS[job.id] ? (
-                      <Image src={LOGOS[job.id]} alt={job.company} width={26} height={26} style={{ objectFit: "contain", maxWidth: "100%", maxHeight: "100%" }} />
-                    ) : (
-                      <span style={{ font: "600 13px var(--font-geist-sans)", color: "var(--ink-2)" }}>
-                        {job.company.slice(0, 2).toUpperCase()}
-                      </span>
-                    )}
-                  </span>
-                  <div style={{ minWidth: 0 }}>
-                    <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 600, letterSpacing: "-0.02em" }}>{job.role}</h3>
-                    <p className="mono" style={{ margin: "6px 0 0", fontSize: "12.5px", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-4)" }}>
-                      {job.company} · {job.period}
-                    </p>
-                    <p style={{ margin: "14px 0 0", fontSize: "15.5px", color: "var(--ink-2)", lineHeight: 1.62 }}>{job.description}</p>
-                  </div>
-                </div>
+          {/* Hero */}
+          <section className="hero-grid" style={{
+            padding: "clamp(52px,10vw,88px) 0 clamp(28px,5vw,40px)",
+            display: "grid", gridTemplateColumns: "1fr auto",
+            gap: "28px", alignItems: "end", borderTop: 0,
+          }}>
+            <div>
+              <Anim>
+                <h1 style={{
+                  margin: 0,
+                  fontFamily: `${inter.style.fontFamily}, "Helvetica Neue", Helvetica, Arial, sans-serif`,
+                  fontWeight: 700,
+                  fontSize: "clamp(40px, 7vw, 64px)",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1,
+                }}>
+                  {profile.name}
+                </h1>
               </Anim>
-            ))}
-          </div>
-          <Anim delay={300}>
-            <div style={{ marginTop: "32px" }}>
-              <Link href="/professional" style={{ fontSize: "14px", color: "var(--ink-4)", fontWeight: 500 }}>
-                View full profile →
-              </Link>
-            </div>
-          </Anim>
-        </section>
-
-        {/* Selected Projects */}
-        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
-          <Anim><p className="label">Selected Projects</p></Anim>
-          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-            {projects.slice(0, 4).map((project, i) => (
-              <Anim key={project.id} delay={i * 50}>
-                <div style={{ display: "grid", gridTemplateColumns: "40px 1fr", gap: "18px" }}>
-                  <span className="item-logo">
-                    <span style={{ font: "600 12px var(--font-geist-sans)", color: "var(--ink-2)" }}>
-                      {project.title.slice(0, 2).toUpperCase()}
-                    </span>
-                  </span>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "14px" }}>
-                      <h3 style={{ margin: 0, fontSize: "17px", fontWeight: 600, letterSpacing: "-0.02em" }}>{project.title}</h3>
-                      <span style={{
-                        fontSize: "12px", fontWeight: 500, padding: "3px 9px",
-                        borderRadius: "6px", border: "1px solid var(--line)",
-                        color: "var(--ink-4)", whiteSpace: "nowrap"
-                      }}>
-                        {project.status}
-                      </span>
-                    </div>
-                    <p className="mono" style={{ margin: "6px 0 0", fontSize: "12.5px", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-4)" }}>
-                      {project.category} · {project.year}
-                    </p>
-                    <p style={{ margin: "12px 0 0", fontSize: "15.5px", color: "var(--ink-2)", lineHeight: 1.62 }}>{project.description}</p>
-                  </div>
-                </div>
-              </Anim>
-            ))}
-          </div>
-          <Anim delay={250}>
-            <div style={{ marginTop: "32px" }}>
-              <Link href="/creative" style={{ fontSize: "14px", color: "var(--ink-4)", fontWeight: 500 }}>
-                All projects →
-              </Link>
-            </div>
-          </Anim>
-        </section>
-
-        {/* Skills */}
-        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
-          <Anim><p className="label">Skills</p></Anim>
-          {[
-            { sub: "Business", items: skills.business },
-            { sub: "Design", items: skills.design },
-            { sub: "Technology", items: skills.technology },
-            { sub: "Tools", items: skills.tools },
-          ].map((block, i) => (
-            <Anim key={block.sub} delay={i * 40}>
-              <div style={{ marginBottom: i < 3 ? "26px" : 0 }}>
-                <p style={{ margin: "0 0 12px", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.09em", color: "var(--ink-4)" }}>
-                  {block.sub}
+              <Anim delay={60}>
+                <p style={{ margin: "16px 0 0", maxWidth: "440px", fontSize: "clamp(17px, 2.1vw, 19.5px)", color: "var(--ink-2)", lineHeight: 1.5 }}>
+                  I turn ideas into working products, using design and AI.
                 </p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "9px" }}>
-                  {block.items.map((s) => (
-                    <span key={s} className="pill">{s}</span>
-                  ))}
+              </Anim>
+              <Anim delay={120}>
+                <a href={`mailto:${profile.email}`} className="cta-btn" style={{ marginTop: "28px" }}>
+                  Get in touch
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M7 17 17 7"/><path d="M9 7h8v8"/>
+                  </svg>
+                </a>
+              </Anim>
+            </div>
+            <Anim delay={80}>
+              <div className="hero-photo" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                <div style={{
+                  width: "96px", height: "96px", borderRadius: "16px", overflow: "hidden",
+                  border: "1px solid var(--line-soft)", background: "var(--surface)",
+                  transform: "rotate(-2deg)", flexShrink: 0,
+                }}>
+                  <Image
+                    src={profile.avatar_url ?? "/avatar.png"}
+                    alt={profile.name}
+                    width={200} height={200}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
+                    priority
+                  />
                 </div>
+                <p className="home-cue" style={{ transform: "rotate(-2deg)" }}>that&apos;s me</p>
               </div>
             </Anim>
-          ))}
-        </section>
+          </section>
 
-        {/* Blog */}
-        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
-          <Anim><p className="label">From the Blog</p></Anim>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            {blogPosts.map((post, i) => (
-              <Anim key={post.id} delay={i * 60}>
-                <Link href={`/blog/${post.slug}`} className="contact-row" style={{ display: "flex", gap: "16px", alignItems: "baseline", textDecoration: "none" }}>
-                  <span style={{ fontSize: "16px", fontWeight: 500 }}>{post.title}</span>
-                  <span style={{ fontSize: "13px", color: "var(--ink-4)", fontFamily: "var(--font-geist-mono)", whiteSpace: "nowrap" }}>
-                    {formatDate(post.published_at ?? "")}
-                  </span>
-                </Link>
-              </Anim>
-            ))}
-          </div>
-          <Anim delay={200}>
-            <div style={{ marginTop: "24px" }}>
-              <Link href="/blog" style={{ fontSize: "14px", color: "var(--ink-4)", fontWeight: 500 }}>
-                All posts →
-              </Link>
-            </div>
-          </Anim>
-        </section>
-
-        {/* Contact */}
-        <section style={{ padding: "clamp(40px,6vw,54px) 0" }} className="section-divider">
-          <Anim><p className="label">Contact</p></Anim>
-          <div>
-            {[
-              { k: "Email", v: profile.email, href: `mailto:${profile.email}` },
-              { k: "LinkedIn", v: "/in/murtazaameen", href: profile.social.linkedin ?? "#" },
-              { k: "Instagram", v: "murtaxa00", href: profile.social.instagram ?? "#" },
-            ].map((row, i) => (
-              <Anim key={row.k} delay={i * 50}>
-                <Link href={row.href} target={row.href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer" className="contact-row">
-                  <span style={{ fontSize: "16.5px", fontWeight: 500 }}>{row.k}</span>
-                  <span style={{ fontSize: "15.5px", color: "var(--ink-2)" }}>{row.v}</span>
-                </Link>
-              </Anim>
-            ))}
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer style={{ padding: "clamp(40px,6vw,56px) 0 clamp(48px,8vw,80px)", borderTop: "1px dashed var(--line)", textAlign: "center" }}>
           <Anim>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "11px" }}>
-              <span style={{
-                width: "30px", height: "30px", borderRadius: "8px",
-                background: "var(--ink)", color: "var(--bg)",
-                display: "grid", placeItems: "center",
-                fontSize: "11.5px", fontWeight: 600, letterSpacing: "0.02em",
-                fontFamily: "var(--font-geist-mono)"
-              }}>
-                GM
-              </span>
-              <span style={{ fontWeight: 600, fontSize: "15.5px" }}>Ghulam Murtaza</span>
-            </div>
+            <p className="home-cue" style={{ margin: "22px 0 0" }}>keep scrolling — the proof is next</p>
           </Anim>
-          <Anim delay={60}>
-            <div className="mono" style={{ marginTop: "18px", fontSize: "13px", color: "var(--ink-4)" }}>
-              © 2026 · Lahore, Pakistan
-            </div>
-          </Anim>
-        </footer>
 
+          {/* Proof strip */}
+          <section className="home-section">
+            <div style={{ marginBottom: "30px" }}>
+              <Anim><p className="home-label">Where the work has landed</p></Anim>
+            </div>
+            <div className="proof-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+              {[
+                { num: "1 hr", desc: "saved daily by the Expense Tracker" },
+                { num: "38+", desc: "motion projects delivered freelance" },
+                { num: "26+", desc: "clients across those projects" },
+              ].map((stat, i) => (
+                <Anim key={stat.num} delay={i * 60}>
+                  <div>
+                    <div style={{
+                      fontFamily: `${inter.style.fontFamily}, Helvetica, sans-serif`,
+                      fontWeight: 700, fontSize: "clamp(30px, 5vw, 42px)",
+                      color: "var(--accent)", lineHeight: 1,
+                    }}>{stat.num}</div>
+                    <div style={{ marginTop: "6px", fontSize: "13.5px", color: "var(--ink-3)" }}>{stat.desc}</div>
+                  </div>
+                </Anim>
+              ))}
+            </div>
+            <Anim delay={200}>
+              <p style={{ marginTop: "26px", fontSize: "14.5px", color: "var(--ink-3)" }}>
+                Time spent at{" "}
+                {companies.slice(0, 4).map((c, i, arr) => (
+                  <span key={c}>
+                    <strong style={{ color: "var(--ink-2)", fontWeight: 600 }}>{c}</strong>
+                    {i < arr.length - 1 ? " · " : ""}
+                  </span>
+                ))}
+              </p>
+            </Anim>
+          </section>
+
+          {/* Selected Work */}
+          <section className="home-section">
+            <div style={{ marginBottom: "30px" }}>
+              <Anim><p className="home-label">Selected work</p></Anim>
+              <Anim delay={40}><p className="home-cue" style={{ marginTop: "6px" }}>problem, what I did, result</p></Anim>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "56px" }}>
+              {projects.slice(0, 2).map((project, i) => (
+                <Anim key={project.id} delay={i * 80}>
+                  <article>
+                    <p style={{ margin: "0 0 12px", fontSize: "12px", fontStyle: "italic", color: "var(--ink-4)" }}>
+                      {i === 0 ? "the main project" : "the concept"}
+                    </p>
+                    {project.image_url ? (
+                      <div style={{ width: "100%", aspectRatio: "16/9", borderRadius: "14px", overflow: "hidden", border: "1px solid var(--line-soft)" }}>
+                        <Image src={project.image_url} alt={project.title} width={700} height={394} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                    ) : (
+                      <div style={{
+                        width: "100%", aspectRatio: "16/9", borderRadius: "14px",
+                        background: "var(--surface)", border: "1px solid var(--line-soft)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "var(--ink-4)", fontSize: "13px", fontStyle: "italic",
+                      }}>
+                        {project.title} screenshot
+                      </div>
+                    )}
+                    <div style={{ marginTop: "18px" }}>
+                      <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 600, letterSpacing: "-0.02em" }}>{project.title}</h3>
+                      <p style={{ margin: "12px 0 0", fontSize: "15.5px", color: "var(--ink-2)", lineHeight: 1.6 }}>{project.description}</p>
+                      <span className="status-pill" style={{ marginTop: "14px" }}>{project.status}</span>
+                    </div>
+                  </article>
+                </Anim>
+              ))}
+            </div>
+          </section>
+
+          {/* About */}
+          <section className="home-section">
+            <div style={{ marginBottom: "30px" }}>
+              <Anim><p className="home-label">About</p></Anim>
+              <Anim delay={40}><p className="home-cue" style={{ marginTop: "6px" }}>true story, all of it</p></Anim>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+              <Anim>
+                <p style={{ margin: 0, fontSize: "17px", color: "var(--ink-2)", lineHeight: 1.68 }}>
+                  {profile.about[0]}
+                </p>
+              </Anim>
+              <Anim delay={60}>
+                <div style={{ display: "flex", gap: "16px", margin: "8px 0 4px" }}>
+                  {[1, 2].map((n) => (
+                    <div key={n} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                      <div style={{
+                        width: "100%", aspectRatio: "1", borderRadius: "14px",
+                        background: "var(--surface)", border: "1px solid var(--line-soft)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "var(--ink-4)", fontSize: "12px", fontStyle: "italic",
+                      }}>
+                        photo {n}
+                      </div>
+                      <p className="home-cue">{n === 1 ? "figuring it out, early" : "still figuring it out"}</p>
+                    </div>
+                  ))}
+                </div>
+              </Anim>
+              {profile.about[1] && (
+                <Anim delay={80}>
+                  <p style={{ margin: 0, fontSize: "17px", color: "var(--ink-2)", lineHeight: 1.68 }}>
+                    {profile.about[1]}
+                  </p>
+                </Anim>
+              )}
+              <Anim delay={100}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "9px", marginTop: "6px" }}>
+                  {["2D Animator", "Motion Designer", "Sales — Vivo", "Product Builder"].map((tag) => (
+                    <span key={tag} className="pill-arc">{tag}</span>
+                  ))}
+                </div>
+              </Anim>
+            </div>
+          </section>
+
+          {/* Contact */}
+          <section className="home-section">
+            <div style={{ marginBottom: "30px" }}>
+              <Anim><p className="home-label">Contact</p></Anim>
+            </div>
+            <Anim>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "20px", flexWrap: "wrap" }}>
+                <p style={{ margin: 0, fontSize: "16px", color: "var(--ink-2)", maxWidth: "340px" }}>
+                  Have something worth building? I&apos;m easiest to reach by email.
+                </p>
+                <a href={`mailto:${profile.email}`} className="cta-btn">
+                  Get in touch
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M7 17 17 7"/><path d="M9 7h8v8"/>
+                  </svg>
+                </a>
+              </div>
+            </Anim>
+          </section>
+
+          {/* Footer */}
+          <footer style={{ padding: "clamp(40px, 6vw, 56px) 0 clamp(48px, 8vw, 80px)", borderTop: "1px dashed var(--line)" }}>
+            <Anim>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "13px", color: "var(--ink-4)" }}>
+                <span style={{ fontFamily: "var(--font-geist-mono)" }}>© 2026 Ghulam Murtaza</span>
+                <Link href="/professional" style={{ color: "var(--ink-3)", textDecoration: "underline", textUnderlineOffset: "3px" }}>
+                  Full resume →
+                </Link>
+              </div>
+            </Anim>
+            <Anim delay={60}>
+              <p className="home-cue" style={{ marginTop: "16px" }}>this page is a case for what&apos;s next, not a finished pitch.</p>
+            </Anim>
+          </footer>
+
+        </div>
       </div>
     </>
   );

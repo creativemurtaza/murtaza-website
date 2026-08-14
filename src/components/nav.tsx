@@ -10,13 +10,41 @@ const links = [
   { href: "/professional", label: "Professional" },
   { href: "/creative", label: "Creative" },
   { href: "/blog", label: "Blog" },
-  { href: "/resume", label: "Resume" },
   { href: "/contact", label: "Contact" },
 ];
 
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const isHome = pathname === "/";
+
+  if (isHome) {
+    return (
+      <header style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "26px clamp(20px, 5vw, 36px) 0",
+        maxWidth: "700px", margin: "0 auto",
+      }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", fontWeight: 600, fontSize: "14.5px", color: "inherit", textDecoration: "none" }}>
+          <span style={{
+            width: "28px", height: "28px", borderRadius: "8px",
+            background: "var(--ink)", color: "var(--bg)",
+            display: "inline-grid", placeItems: "center",
+            fontSize: "10.5px", fontWeight: 600, letterSpacing: "0.02em",
+            fontFamily: "var(--font-geist-mono)",
+          }}>GM</span>
+          Ghulam Murtaza
+        </Link>
+        <Link href="/professional" style={{
+          fontSize: "13.5px", color: "var(--ink-3)",
+          textDecoration: "underline", textUnderlineOffset: "3px",
+          textDecorationColor: "var(--line)", transition: "text-decoration-color .25s, color .25s",
+        }}>
+          Resume
+        </Link>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/90 backdrop-blur-sm">
