@@ -254,7 +254,7 @@ export default function Home() {
                   {[1, 2].map((n) => (
                     <div key={n} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
                       <div style={{
-                        width: "100%", aspectRatio: "1", borderRadius: "14px",
+                        width: "100%", aspectRatio: "4/5", borderRadius: "14px",
                         background: "var(--surface)", border: "1px solid var(--line-soft)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         color: "var(--ink-4)", fontSize: "12px", fontStyle: "italic",
