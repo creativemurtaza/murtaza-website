@@ -140,19 +140,26 @@ export default function Home() {
               </Anim>
             </div>
             <Anim delay={80}>
-              <div className="hero-photo" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+              <div className="hero-photo" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
                 <div style={{
-                  width: "96px", height: "96px", borderRadius: "16px", overflow: "hidden",
-                  border: "1px solid var(--line-soft)", background: "var(--surface)",
-                  transform: "rotate(-2deg)", flexShrink: 0,
-                }}>
-                  <Image
-                    src={profile.avatar_url ?? "/avatar.png"}
-                    alt={profile.name}
-                    width={200} height={200}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
-                    priority
-                  />
+                  width: "220px", aspectRatio: "3/4", flexShrink: 0,
+                  background: "#fff",
+                  padding: "10px 10px 14px",
+                  borderRadius: "4px",
+                  boxShadow: "0 10px 30px -12px oklch(0 0 0 / 0.28), 0 2px 6px -2px oklch(0 0 0 / 0.12)",
+                  transform: "rotate(-2deg)",
+                  transition: "transform .35s var(--ease)",
+                }} className="polaroid">
+                  <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden", background: "var(--surface)" }}>
+                    <Image
+                      src={profile.avatar_url ?? "/avatar.png"}
+                      alt={profile.name}
+                      fill
+                      sizes="220px"
+                      style={{ objectFit: "cover", objectPosition: "center top" }}
+                      priority
+                    />
+                  </div>
                 </div>
                 <p className="home-cue" style={{ transform: "rotate(-2deg)" }}>that&apos;s me</p>
               </div>
