@@ -260,17 +260,13 @@ export default function Home() {
                         color: "var(--ink-4)", fontSize: "12px", fontStyle: "italic",
                         overflow: "hidden", position: "relative",
                       }}>
-                        {n === 1 ? (
-                          <Image
-                            src="/about/photo-1.jpg"
-                            alt="Ghulam Murtaza"
-                            fill
-                            sizes="(max-width: 640px) 45vw, 320px"
-                            style={{ objectFit: "cover" }}
-                          />
-                        ) : (
-                          <>photo {n}</>
-                        )}
+                        <Image
+                          src={`/about/photo-${n}.jpg`}
+                          alt="Ghulam Murtaza"
+                          fill
+                          sizes="(max-width: 640px) 45vw, 320px"
+                          style={{ objectFit: "cover" }}
+                        />
                       </div>
                       <p className="home-cue">{n === 1 ? "figuring it out, early" : "still figuring it out"}</p>
                     </div>
