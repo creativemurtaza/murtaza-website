@@ -9,6 +9,7 @@ import { Menu, X } from "lucide-react";
 const links = [
   { href: "/professional", label: "Professional" },
   { href: "/creative", label: "Creative" },
+  { href: "/funnels", label: "Funnels" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
@@ -17,6 +18,9 @@ export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const isHome = pathname === "/";
+
+  // /funnels ships its own sticky anchor nav
+  if (pathname === "/funnels") return null;
 
   if (isHome) {
     return (
