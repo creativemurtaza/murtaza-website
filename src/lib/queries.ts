@@ -103,7 +103,7 @@ export async function getProjects(): Promise<Project[]> {
     if (error || !data?.length) throw error;
     return data as Project[];
   } catch {
-    return staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, sort_order: i }));
+    return staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, project_url: null, sort_order: i }));
   }
 }
 

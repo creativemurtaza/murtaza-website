@@ -10,18 +10,18 @@ export default function EditProject() {
   const { id } = useParams() as { id: string };
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ title: "", category: "", description: "", tags: [] as string[], status: "", year: "", image_url: "", sort_order: 0 });
+  const [form, setForm] = useState({ title: "", category: "", description: "", tags: [] as string[], status: "", year: "", image_url: "", project_url: "", sort_order: 0 });
   useEffect(() => {
     const supabase = createBrowserSupabase();
     supabase.from("projects").select("*").eq("id", id).single().then(({ data }) => {
-      if (data) setForm({ title: data.title, category: data.category, description: data.description || "", tags: data.tags || [], status: data.status || "", year: data.year || "", image_url: data.image_url || "", sort_order: data.sort_order || 0 });
+      if (data) setForm({ title: data.title, category: data.category, description: data.description || "", tags: data.tags || [], status: data.status || "", year: data.year || "", image_url: data.image_url || "", project_url: data.project_url || "", sort_order: data.sort_order || 0 });
       setLoading(false);
     });
   }, [id]);
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setSaving(true);
     const supabase = createBrowserSupabase();
-    await supabase.from("projects").update({ ...form, image_url: form.image_url || null }).eq("id", id);
+    await supabase.from("projects").update({ ...form, image_url: form.image_url || null, project_url: form.project_url || null }).eq("id", id);
     router.push("/admin/projects");
   }
   if (loading) return <div style={{ padding: "40px" }}>Loading...</div>;
@@ -37,6 +37,7 @@ export default function EditProject() {
         <FormField label="Year" value={form.year} onChange={(v) => setForm({ ...form, year: v })} />
         <TagField label="Tags" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} />
         <ImageUpload label="Project Image" value={form.image_url || null} onChange={(url) => setForm({ ...form, image_url: url })} />
+        <FormField label="Project URL" value={form.project_url} onChange={(v) => setForm({ ...form, project_url: v })} placeholder="https://behance.net/gallery/..." />
         <FormField label="Sort Order" value={String(form.sort_order)} onChange={(v) => setForm({ ...form, sort_order: Number(v) || 0 })} />
         <button type="submit" disabled={saving} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 500, background: "var(--ink)", color: "var(--bg)", border: "none", borderRadius: "9px", cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving..." : "Update"}</button>
       </form>

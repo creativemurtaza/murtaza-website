@@ -8,11 +8,11 @@ import { PageHeader } from "@/components/admin/page-header";
 export default function NewProject() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ title: "", category: "", description: "", tags: [] as string[], status: "", year: "", image_url: "" });
+  const [form, setForm] = useState({ title: "", category: "", description: "", tags: [] as string[], status: "", year: "", image_url: "", project_url: "" });
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setSaving(true);
     const supabase = createBrowserSupabase();
-    await supabase.from("projects").insert({ id: crypto.randomUUID(), ...form, image_url: form.image_url || null, sort_order: 0 });
+    await supabase.from("projects").insert({ id: crypto.randomUUID(), ...form, image_url: form.image_url || null, project_url: form.project_url || null, sort_order: 0 });
     router.push("/admin/projects");
   }
   return (
@@ -27,6 +27,7 @@ export default function NewProject() {
         <FormField label="Year" value={form.year} onChange={(v) => setForm({ ...form, year: v })} />
         <TagField label="Tags" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} />
         <ImageUpload label="Project Image" value={form.image_url || null} onChange={(url) => setForm({ ...form, image_url: url })} />
+        <FormField label="Project URL" value={form.project_url} onChange={(v) => setForm({ ...form, project_url: v })} placeholder="https://behance.net/gallery/..." />
         <button type="submit" disabled={saving} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 500, background: "var(--ink)", color: "var(--bg)", border: "none", borderRadius: "9px", cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving..." : "Add Project"}</button>
       </form>
     </div>

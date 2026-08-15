@@ -51,7 +51,7 @@ const categoryLabels: Record<Category, string> = {
 
 export default function CreativePage() {
   const [projects, setProjects] = useState<Project[]>(
-    staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, sort_order: i }))
+    staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, project_url: null, sort_order: i }))
   );
   const [active, setActive] = useState<Category>("all");
 
@@ -107,6 +107,7 @@ export default function CreativePage() {
         }
         .card:hover .card-img { transform: scale(1.02); }
         .card-img { transition: transform .5s var(--ease); }
+        a:hover .card-arrow { color: var(--ink); transform: translate(2px, -2px); }
         .grid-wrap {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -186,8 +187,8 @@ export default function CreativePage() {
               </div>
             ) : (
               <div className="grid-wrap">
-                {filtered.map((project, i) => (
-                  <Anim key={project.id} delay={i * 40}>
+                {filtered.map((project, i) => {
+                  const inner = (
                     <div className="card">
                       <div style={{
                         width: "100%", aspectRatio: "1",
@@ -216,8 +217,11 @@ export default function CreativePage() {
                         )}
                       </div>
                       <div style={{ marginTop: "16px" }}>
-                        <h3 style={{ margin: 0, fontSize: "17px", fontWeight: 600, letterSpacing: "-0.02em" }}>
+                        <h3 style={{ margin: 0, fontSize: "17px", fontWeight: 600, letterSpacing: "-0.02em", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                           {project.title}
+                          {project.project_url && (
+                            <span className="card-arrow" style={{ display: "inline-block", color: "var(--ink-4)", transition: "transform .3s var(--ease), color .3s" }}>↗</span>
+                          )}
                         </h3>
                         <p style={{
                           margin: "6px 0 0", fontSize: "12.5px",
@@ -231,8 +235,17 @@ export default function CreativePage() {
                         </p>
                       </div>
                     </div>
-                  </Anim>
-                ))}
+                  );
+                  return (
+                    <Anim key={project.id} delay={i * 40}>
+                      {project.project_url ? (
+                        <a href={project.project_url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none", display: "block" }}>
+                          {inner}
+                        </a>
+                      ) : inner}
+                    </Anim>
+                  );
+                })}
               </div>
             )}
           </section>

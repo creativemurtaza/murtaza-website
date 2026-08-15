@@ -35,7 +35,7 @@ export default function Home() {
     staticExperience.map((e, i) => ({ ...e, sort_order: i }))
   );
   const [projects, setProjects] = useState<Project[]>(
-    staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, sort_order: i }))
+    staticProjects.map((p, i) => ({ ...p, category: p.category as Project["category"], image_url: null, project_url: null, sort_order: i }))
   );
 
   useEffect(() => {
