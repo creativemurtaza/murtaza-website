@@ -258,8 +258,19 @@ export default function Home() {
                         background: "var(--surface)", border: "1px solid var(--line-soft)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         color: "var(--ink-4)", fontSize: "12px", fontStyle: "italic",
+                        overflow: "hidden", position: "relative",
                       }}>
-                        photo {n}
+                        {n === 1 ? (
+                          <Image
+                            src="/about/photo-1.jpg"
+                            alt="Ghulam Murtaza"
+                            fill
+                            sizes="(max-width: 640px) 45vw, 320px"
+                            style={{ objectFit: "cover" }}
+                          />
+                        ) : (
+                          <>photo {n}</>
+                        )}
                       </div>
                       <p className="home-cue">{n === 1 ? "figuring it out, early" : "still figuring it out"}</p>
                     </div>
